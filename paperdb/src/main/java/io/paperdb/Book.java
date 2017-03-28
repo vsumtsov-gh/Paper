@@ -18,6 +18,7 @@ public class Book {
      * Destroys all data saved in Book.
      */
     public void destroy() {
+        System.out.println("CHECK11 destroy");
         mStorage.destroy();
     }
 
@@ -30,6 +31,7 @@ public class Book {
      * @return this Book instance
      */
     public <T> Book write(String key, T value) {
+        System.out.println("CHECK11 write");
         if (value == null) {
             throw new PaperDbException("Paper doesn't support writing null root values");
         } else {
@@ -49,6 +51,7 @@ public class Book {
      * @return the saved object instance or null
      */
     public <T> T read(String key) {
+        System.out.println("CHECK11 read");
         return read(key, null);
     }
 
@@ -64,6 +67,7 @@ public class Book {
      * @return the saved object instance or null
      */
     public <T> T read(String key, T defaultValue) {
+        System.out.println("CHECK11 read");
         T value = mStorage.select(key);
         return value == null ? defaultValue : value;
     }
@@ -75,6 +79,7 @@ public class Book {
      * @return true if object with given key exists in Book storage, false otherwise
      */
     public boolean exist(String key) {
+        System.out.println("CHECK11 exist");
         return mStorage.exist(key);
     }
 
@@ -84,6 +89,7 @@ public class Book {
      * @param key object key
      */
     public void delete(String key) {
+        System.out.println("CHECK11 delete");
         mStorage.deleteIfExists(key);
     }
 
@@ -93,6 +99,7 @@ public class Book {
      * @return all keys
      */
     public List<String> getAllKeys() {
+        System.out.println("CHECK11 getAllKeys");
         return mStorage.getAllKeys();
     }
 
