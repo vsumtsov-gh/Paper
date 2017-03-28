@@ -205,15 +205,15 @@ public class DbStoragePlainFile implements Storage {
      */
     private <E> void writeTableFile(String key, PaperTable<E> paperTable,
                                     File originalFile, File backupFile) {
+        Output kryoOutput = null;
         try {
             FileOutputStream fileStream = new FileOutputStream(originalFile);
 
-            final Output kryoOutput = new Output(fileStream);
+            kryoOutput = new Output(fileStream);
             getKryo().writeObject(kryoOutput, paperTable);
             kryoOutput.flush();
             fileStream.flush();
             sync(fileStream);
-            kryoOutput.close(); //also close file stream
 
             // Writing was successful, delete the backup file if there is one.
             //noinspection ResultOfMethodCallIgnored
@@ -228,6 +228,8 @@ public class DbStoragePlainFile implements Storage {
             }
             throw new PaperDbException("Couldn't save table: " + key + ". " +
                     "Backed up table will be used on next read attempt", e);
+        } finally {
+            if (kryoOutput != null) kryoOutput.close();
         }
     }
 
@@ -237,16 +239,16 @@ public class DbStoragePlainFile implements Storage {
 
     private <E> E readTableFile(String key, File originalFile,
                                 boolean v1CompatibilityMode) {
+        Input input = null;
         try {
-            final Input i = new Input(new FileInputStream(originalFile));
+            input = new Input(new FileInputStream(originalFile));
             final Kryo kryo = getKryo();
             if (v1CompatibilityMode) {
                 // Set temporary generic optimization to support Kryo 3.x format
                 kryo.getFieldSerializerConfig().setOptimizedGenerics(true);
             }
             //noinspection unchecked
-            final PaperTable<E> paperTable = kryo.readObject(i, PaperTable.class);
-            i.close();
+            final PaperTable<E> paperTable = kryo.readObject(input, PaperTable.class);
             if (v1CompatibilityMode) {
                 kryo.getFieldSerializerConfig().setOptimizedGenerics(false);
             }
@@ -266,6 +268,8 @@ public class DbStoragePlainFile implements Storage {
             String errorMessage = "Couldn't read/deserialize file "
                     + originalFile + " for table " + key;
             throw new PaperDbException(errorMessage, e);
+        } finally {
+            if (input != null) input.close();
         }
     }
 
